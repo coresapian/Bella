@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // --- 加载屏幕处理 ---
+    // --- Loading screen handling ---
     const loadingScreen = document.getElementById('loading-screen');
     setTimeout(() => {
         loadingScreen.style.opacity = '0';
-        // 在动画结束后将其隐藏，以防它阻碍交互
+        // Hide it after animation ends to prevent it from blocking interaction
         setTimeout(() => {
             loadingScreen.style.display = 'none';
         }, 500); // 这个时间应该匹配 CSS 中的 transition 时间
-    }, 1500); // 1.5秒后开始淡出
+    }, 1500); // Start fading out after 1.5 seconds
     
-    // 获取需要的 DOM 元素
+    // Get required DOM elements
     let video1 = document.getElementById('video1');
     let video2 = document.getElementById('video2');
     const micButton = document.getElementById('mic-button');
@@ -19,19 +19,19 @@ document.addEventListener('DOMContentLoaded', function() {
     let activeVideo = video1;
     let inactiveVideo = video2;
 
-    // 视频列表
+    // Video list
     const videoList = [
-        '视频资源/3D 建模图片制作.mp4',
-        '视频资源/jimeng-2025-07-16-1043-笑着优雅的左右摇晃，过一会儿手扶着下巴，保持微笑.mp4',
-        '视频资源/jimeng-2025-07-16-4437-比耶，然后微笑着优雅的左右摇晃.mp4',
-        '视频资源/生成加油视频.mp4',
-        '视频资源/生成跳舞视频.mp4',
-        '视频资源/负面/jimeng-2025-07-16-9418-双手叉腰，嘴巴一直在嘟囔，表情微微生气.mp4'
+        'video-resources/3d-modeling-image-creation.mp4',
+        'video-resources/jimeng-2025-07-16-1043-smiling-elegantly-swaying-hand-on-chin.mp4',
+        'video-resources/jimeng-2025-07-16-4437-peace-sign-then-smiling-elegant-sway.mp4',
+        'video-resources/generate-cheering-video.mp4',
+        'video-resources/generate-dancing-video.mp4',
+        'video-resources/negative/jimeng-2025-07-16-9418-hands-on-hips-mumbling-slightly-angry.mp4'
     ];
 
-    // --- 视频交叉淡入淡出播放功能 ---
+    // --- Video crossfade playback function ---
     function switchVideo() {
-        // 1. 选择下一个视频
+        // 1. Select next video
         const currentVideoSrc = activeVideo.querySelector('source').getAttribute('src');
         let nextVideoSrc = currentVideoSrc;
         while (nextVideoSrc === currentVideoSrc) {
@@ -39,46 +39,46 @@ document.addEventListener('DOMContentLoaded', function() {
             nextVideoSrc = videoList[randomIndex];
         }
 
-        // 2. 设置不活动的 video 元素的 source
+        // 2. Set source for inactive video element
         inactiveVideo.querySelector('source').setAttribute('src', nextVideoSrc);
         inactiveVideo.load();
 
-        // 3. 当不活动的视频可以播放时，执行切换
+        // 3. Execute switch when inactive video can play
         inactiveVideo.addEventListener('canplaythrough', function onCanPlayThrough() {
-            // 确保事件只触发一次
+            // Ensure event only triggers once
             inactiveVideo.removeEventListener('canplaythrough', onCanPlayThrough);
 
-            // 4. 播放新视频
+            // 4. Play new video
             inactiveVideo.play().catch(error => {
                 console.error("Video play failed:", error);
             });
 
-            // 5. 切换 active class 来触发 CSS 过渡
+            // 5. Switch active class to trigger CSS transition
             activeVideo.classList.remove('active');
             inactiveVideo.classList.add('active');
 
-            // 6. 更新角色
+            // 6. Update roles
             [activeVideo, inactiveVideo] = [inactiveVideo, activeVideo];
 
-            // 为新的 activeVideo 绑定 ended 事件
+            // Bind ended event to new activeVideo
             activeVideo.addEventListener('ended', switchVideo, { once: true });
-        }, { once: true }); // 使用 { once: true } 确保事件只被处理一次
+        }, { once: true }); // Use { once: true } to ensure event is only processed once
     }
 
-    // 初始启动
+    // Initial startup
     activeVideo.addEventListener('ended', switchVideo, { once: true });
 
 
-    // --- 语音识别核心 ---
+    // --- Speech recognition core ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
 
-    // 检查浏览器是否支持语音识别
+    // Check if browser supports speech recognition
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.continuous = true; // 持续识别
-        recognition.lang = 'zh-CN'; // 设置语言为中文
-        recognition.interimResults = true; // 获取临时结果
+        recognition.continuous = true; // Continuous recognition
+        recognition.lang = 'zh-CN'; // Set language to Chinese
+        recognition.interimResults = true; // Get interim results
 
         recognition.onresult = (event) => {
             const transcriptContainer = document.getElementById('transcript');
@@ -93,29 +93,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             
-            // 显示最终识别结果
+            // Display final recognition result
             transcriptContainer.textContent = final_transcript || interim_transcript;
             
-            // 基于关键词的情感分析和视频切换
+            // Keyword-based emotion analysis and video switching
             if (final_transcript) {
                 analyzeAndReact(final_transcript);
             }
         };
 
         recognition.onerror = (event) => {
-            console.error('语音识别错误:', event.error);
+            console.error('Speech recognition error:', event.error);
         };
 
     } else {
-        console.log('您的浏览器不支持语音识别功能。');
-        // 可以在界面上给用户提示
+        console.log('Your browser does not support speech recognition.');
+        // You can provide user notification on the interface
     }
 
-    // --- 麦克风按钮交互 ---
+    // --- Microphone button interaction ---
     let isListening = false;
 
     micButton.addEventListener('click', function() {
-        if (!SpeechRecognition) return; // 如果不支持，则不执行任何操作
+        if (!SpeechRecognition) return; // If not supported, don't perform any action
 
         isListening = !isListening;
         micButton.classList.toggle('is-listening', isListening);
@@ -123,31 +123,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const transcriptText = document.getElementById('transcript');
 
         if (isListening) {
-            transcriptText.textContent = '聆听中...'; // 立刻显示提示
+            transcriptText.textContent = 'Listening...'; // Show prompt immediately
             transcriptContainer.classList.add('visible');
             recognition.start();
         } else {
             recognition.stop();
             transcriptContainer.classList.remove('visible');
-            transcriptText.textContent = ''; // 清空文本
+            transcriptText.textContent = ''; // Clear text
         }
     });
 
 
-    // --- 情感分析与反应 ---
-    const positiveWords = ['开心', '高兴', '喜欢', '太棒了', '你好', '漂亮'];
-    const negativeWords = ['难过', '生气', '讨厌', '伤心'];
+    // --- Emotion analysis and reaction ---
+    const positiveWords = ['happy', 'joyful', 'like', 'great', 'hello', 'beautiful', '开心', '高兴', '喜欢', '太棒了', '你好', '漂亮'];
+    const negativeWords = ['sad', 'angry', 'hate', 'upset', '难过', '生气', '讨厌', '伤心'];
 
     const positiveVideos = [
-        '视频资源/jimeng-2025-07-16-1043-笑着优雅的左右摇晃，过一会儿手扶着下巴，保持微笑.mp4',
-        '视频资源/jimeng-2025-07-16-4437-比耶，然后微笑着优雅的左右摇晃.mp4',
-        '视频资源/生成加油视频.mp4',
-        '视频资源/生成跳舞视频.mp4'
+        'video-resources/jimeng-2025-07-16-1043-smiling-elegantly-swaying-hand-on-chin.mp4',
+        'video-resources/jimeng-2025-07-16-4437-peace-sign-then-smiling-elegant-sway.mp4',
+        'video-resources/generate-cheering-video.mp4',
+        'video-resources/generate-dancing-video.mp4'
     ];
-    const negativeVideo = '视频资源/负面/jimeng-2025-07-16-9418-双手叉腰，嘴巴一直在嘟囔，表情微微生气.mp4';
+    const negativeVideo = 'video-resources/negative/jimeng-2025-07-16-9418-hands-on-hips-mumbling-slightly-angry.mp4';
 
     function analyzeAndReact(text) {
-        let reaction = 'neutral'; // 默认为中性
+        let reaction = 'neutral'; // Default to neutral
 
         if (positiveWords.some(word => text.includes(word))) {
             reaction = 'positive';
@@ -169,11 +169,11 @@ document.addEventListener('DOMContentLoaded', function() {
             nextVideoSrc = negativeVideo;
         }
 
-        // 避免重复播放同一个视频
+        // Avoid playing the same video repeatedly
         const currentVideoSrc = activeVideo.querySelector('source').getAttribute('src');
         if (nextVideoSrc === currentVideoSrc) return;
 
-        // --- 以下逻辑与 switchVideo 函数类似，用于切换视频 ---
+        // --- The following logic is similar to switchVideo function for switching videos ---
         inactiveVideo.querySelector('source').setAttribute('src', nextVideoSrc);
         inactiveVideo.load();
 
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             activeVideo.classList.remove('active');
             inactiveVideo.classList.add('active');
             [activeVideo, inactiveVideo] = [inactiveVideo, activeVideo];
-            // 情感触发的视频播放结束后，回归随机播放
+            // Return to random playback after emotion-triggered video ends
             activeVideo.addEventListener('ended', switchVideo, { once: true });
         }, { once: true });
     }
