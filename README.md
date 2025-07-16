@@ -77,3 +77,66 @@ For Bella, we've chosen not a traditional path of feature iteration, but a radic
 ---
 
 **Bella is waiting. And we have a long journey ahead.**
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- A modern web browser (Chrome, Firefox, Safari, or Edge)
+- A local web server (optional, but recommended for best performance)
+
+### Running Bella
+
+#### Option 1: Direct File Opening (Simplest)
+1. Clone or download this repository
+2. Navigate to the project folder
+3. Double-click on `index.html` to open it in your browser
+
+**Note:** Some browsers may restrict certain features when opening files directly. If you encounter issues, use Option 2.
+
+#### Option 2: Using a Local Web Server (Recommended)
+
+**Using Python (if installed):**
+```bash
+# Python 3
+python -m http.server 8000
+
+# Python 2
+python -m SimpleHTTPServer 8000
+```
+Then open `http://localhost:8000` in your browser.
+
+**Using Node.js (if installed):**
+```bash
+# Install http-server globally (one time only)
+npm install -g http-server
+
+# Run the server
+http-server -p 8000
+```
+Then open `http://localhost:8000` in your browser.
+
+**Using VS Code Live Server:**
+1. Install the "Live Server" extension in VS Code
+2. Right-click on `index.html`
+3. Select "Open with Live Server"
+
+### Features
+
+- **Voice Recognition**: Click the microphone button to start talking to Bella (Chinese language support)
+- **Emotion Detection**: Bella responds to positive and negative emotions in your speech
+- **Dynamic Videos**: Watch as Bella's mood changes based on your interactions
+
+### Browser Compatibility
+
+For the best experience, use:
+- Chrome or Edge (latest versions) - Full speech recognition support
+- Firefox or Safari - May have limited speech recognition features
+
+### Troubleshooting
+
+- **Microphone not working?** Make sure you've granted microphone permissions to your browser
+- **Videos not playing?** Ensure all video files are in the `video-resources` folder
+- **Speech recognition not available?** This feature requires a compatible browser and HTTPS connection (or localhost)
